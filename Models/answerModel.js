@@ -9,10 +9,7 @@ const answerSchema  = new Schema({
         required: true
     },
 
-    votes:{
-        type: Number,
-        default: 0
-    },
+    votes:[mongoose.ObjectId],
 
     userName:{
         type:String
@@ -29,6 +26,9 @@ const answerSchema  = new Schema({
 
     question:{
         type:mongoose.ObjectId
+    },
+    date:{
+        type:Date
     }
 
 });

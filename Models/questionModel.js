@@ -7,7 +7,7 @@ const questionSchema = new Schema({
         type: String,
         trim: true,
         minLength: 15,
-        maxLength: 60,
+        maxLength: 100,
         required: true
     },
 
@@ -31,19 +31,17 @@ const questionSchema = new Schema({
         required: true
     },
 
-    votes: {
-        type: Number,
-        default: 0
-    },
+    votes: [mongoose.ObjectId],
 
-    views: {
-        type: Number,
-        default: 0
-    },
+    views: [mongoose.ObjectId], 
 
     tags:[String],
 
-    answers: [mongoose.ObjectId]
+    answers: [mongoose.ObjectId],
+    
+    date: {
+        type: Date
+    }
 });
 
 const questionModel = model("questions", questionSchema);

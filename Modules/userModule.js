@@ -53,6 +53,13 @@ module.exports.login = async (req, res) => {
     });
   }
 
+  //userDetails
+  const userDetails = {
+    name: user.name,
+    email: user.email,
+    about: user.about,
+    _id: user["_id"]
+  }
   //password comparison
   const passwordMatchResponse = await bcrypt.compare(
     req.body.password,
@@ -69,7 +76,8 @@ module.exports.login = async (req, res) => {
 
   res.send({
     token,
-    user
+    userDetails
   });
 
 };
+
