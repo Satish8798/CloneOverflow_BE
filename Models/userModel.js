@@ -28,7 +28,8 @@ const userSchema = new Schema({
         type: String
     },
     questions:[mongoose.ObjectId],
-    answers:[mongoose.ObjectId]
+    answers:[mongoose.ObjectId],
+    otpUsed: Number
 });
 
 //creating model for mentor schema

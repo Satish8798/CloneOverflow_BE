@@ -2,6 +2,7 @@ const userModel = require("../Models/userModel");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 
 module.exports.signup = async (req, res) => {
   //email id check in databasse
@@ -81,3 +82,111 @@ module.exports.login = async (req, res) => {
 
 };
 
+module.exports.search = async (req, res, next) => {
+  try {
+      const response = await userModel.find({email: req.body.email});
+      console.log(response)
+    if (response.length > 0) {
+     let otp = await sendOtp(response[0].email);
+     const updateResponse = await userModel.update(
+          { email: req.body.email },
+          { $set: { otpUsed: otp } }
+        );
+      if (response) {
+        res.status(200).send({
+          msg: true,
+        });
+      }
+    } else {
+      res.status(200).send({
+        msg: false,
+      });
+    }
+  } catch (error) {
+    if (error) {
+      // console.log(error)
+      res.status(500).send({
+        msg: error,
+      });
+    }
+  }
+};
+
+
+module.exports.resetPassword = async (req,res) =>{
+  try {
+    if (req.body.newPassword === req.body.confirmPassword) {
+      const randomString = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(
+        req.body.newPassword,
+        randomString
+      );
+      const response = await userModel.update(
+          { email: req.body.email },
+          { $set: { password: hashedPassword } }
+        );
+      if (response) {
+        res.status(200).send({
+          msg: true,
+        });
+      }
+    } else {
+      res.status(200).send({
+        msg: false,
+      });
+    }
+  } catch (error) {
+    res.status(500).send({
+      msg: error,
+    });
+  }
+}
+
+module.exports.otpCheck = async (req, res) =>{
+  const response = await userModel.find({ email: req.body.email })
+
+      if (response.length > 0) {
+        if(parseInt(req.body.otp)===response[0].otpUsed){
+          res.status(200).send({
+            msg: true,
+          });
+        }else{
+          res.status(200).send({
+            msg: false,
+          });
+        }
+         
+       } else {
+         res.status(400).send({
+           msg: false,
+         });
+       }
+}
+
+function sendOtp(email) {
+  let otp= parseInt(Math.random()*10000);
+  let transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.gmail,
+      pass: process.env.password,
+    },
+  });
+  var mailOptions = {
+    from: process.env.gmail,
+    to: email,
+    subject: "OTP for changing password",
+    html: "<h2>Please Enter this OTP to reset password</h2><br><p>[ "+otp+" ]</p>",
+
+  };
+
+ transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent" + info.response);
+    }
+  });
+
+return otp;
+}
