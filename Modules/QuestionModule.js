@@ -110,7 +110,8 @@ module.exports.downVote = async (req, res) => {
 };
 
 module.exports.getResults = async (req, res) => {
-  const tag = req.query.tag;
+  let tag = req.query.tag;
+  tag = tag.toLowerCase();
   try {
     const results = await questionModel.find({ tags: tag });
     res.status(200).send({
