@@ -112,6 +112,34 @@ module.exports.search = async (req, res, next) => {
   }
 };
 
+module.exports.getUserQuestions = async (req,res)=>{
+  try {
+    let userId = req.params.userId;
+    userId = mongoose.Types.ObjectId(userId)
+    const response = await userModel.aggregate([
+      {
+        $match:{_id: userId}
+      }
+    ]).lookup({
+      from:"questions",
+      localField: "questions",
+      foreignField: '_id',
+      as: "userQuestions"
+    }).project({
+      userQuestions: 1
+    });
+    res.send(response);
+
+  } catch (error) {
+    if (error) {
+      console.log(error)
+      res.status(500).send({
+        msg: "error",
+      });
+    }
+  }
+}
+
 
 module.exports.resetPassword = async (req,res) =>{
   try {

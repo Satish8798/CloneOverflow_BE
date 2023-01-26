@@ -10,4 +10,5 @@ router.post("/login", userModule.login);
 router.post("/reset-password",userModule.resetPassword);
 router.post('/check-otp',userModule.otpCheck);
 router.post('/search-account',userModule.search);
+router.get('/questions/:userId',userModule.getUserQuestions);
 module.exports = router;
