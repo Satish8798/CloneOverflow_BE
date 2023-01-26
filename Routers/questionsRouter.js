@@ -10,6 +10,7 @@ router.post("/upvote",AuthModule.authenticateUser,questionModule.upVote);
 router.post("/downvote",AuthModule.authenticateUser,questionModule.downVote);
 router.get("/get-results",questionModule.getResults);
 router.post("/:questionId",questionModule.getQuestionDetails);
+router.delete("/delete/:questionId",questionModule.deleteQuestion);
 
 
 module.exports= router

@@ -1,6 +1,7 @@
 const questionModel = require("../Models/questionModel");
 const mongoose = require("mongoose");
 const userModel = require("../Models/userModel");
+const answerModel = require("../Models/answerModel");
 
 module.exports.createQuestion = async (req, res) => {
   const question = new questionModel({ ...req.body });
@@ -118,7 +119,32 @@ module.exports.getResults = async (req, res) => {
       results,
     });
   } catch (error) {
-    console.log(error);
+    res.status(400).send({
+      error,
+    });
+  }
+};
+
+module.exports.deleteQuestion = async (req, res) => {
+  let questionId = req.params.questionId;
+  try {
+    const question = await questionModel.findOne({ _id: questionId });
+    const userId = question.user;
+    const answers = question.answers;
+
+    const userUpdateResponse = await userModel.updateOne(
+      { _id: userId },
+      { $pull: { questions: question["_id"] } }
+    );
+
+    const questionDeleteResponse = await questionModel.deleteOne({_id: questionId});
+
+    const answersDeleteResponse = await answerModel.deleteMany({_id: {$in: answers}});
+
+    const userUpdateResponseTwo = await userModel.updateMany({answers : {$in : answers}},{$pull:{answers:{$in : answers}}});
+
+    res.status(200).send(true);
+  } catch (error) {
     res.status(400).send({
       error,
     });
