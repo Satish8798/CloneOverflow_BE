@@ -127,6 +127,7 @@ module.exports.getResults = async (req, res) => {
 
 module.exports.deleteQuestion = async (req, res) => {
   let questionId = req.params.questionId;
+  console.log("hi")
   try {
     const question = await questionModel.findOne({ _id: questionId });
     const userId = question.user;
